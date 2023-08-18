@@ -107,8 +107,28 @@ HelpDialog::HelpDialog(Game *game)
     : Dialog(game, Pixmap::get("Help.png"), "Help") {
     tabWidget = new QTabWidget(this);
     tabWidget->addTab(newTextEdit("Rules.html"), "Rules");
-    tabWidget->addTab(newTextEdit("About.html"), "About");
     vboxLayout->insertWidget(0, tabWidget);
+
+    auto aboutFrame = new QFrame(this);
+    tabWidget->addTab(aboutFrame, "About");
+
+    auto aboutLayout = new QGridLayout(aboutFrame);
+    aboutLayout->setSpacing(0);
+    aboutLayout->setContentsMargins(0, 0, 0, 0);
+    aboutLayout->addWidget(newTextEdit("About.html"), 0, 0, 1, 0);
+
+    auto webButton = new QPushButton("Website");
+    webButton->setCursor(Qt::PointingHandCursor);
+    connect(webButton, &QPushButton::clicked, this, [] {
+        QUrl url("https://github.com/HenryZhao2020/Wordle");
+        QDesktopServices::openUrl(url);
+    });
+    aboutLayout->addWidget(webButton, 1, 0);
+
+    auto qtButton = new QPushButton("About Qt");
+    qtButton->setCursor(Qt::PointingHandCursor);
+    connect(qtButton, &QPushButton::clicked, this, &QApplication::aboutQt);
+    aboutLayout->addWidget(qtButton, 1, 1);
 }
 
 QTextEdit *HelpDialog::newTextEdit(const QString &htmlFile) {
