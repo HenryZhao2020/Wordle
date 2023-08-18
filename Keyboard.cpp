@@ -37,16 +37,9 @@ bool Keyboard::verifyKey(const QString &letter, Color color) {
     }
 
     Color oldColor = Attr::keyColors[letter];
-    if (oldColor == Color::GREEN) {
-        return false;
-    }
-    if (oldColor == Color::YELLOW && color != Color::GREEN) {
-        return false;
-    }
-    if (oldColor == Color::GRAY && color == Color::GRAY) {
-        return false;
-    }
-    return true;
+    return !(oldColor == Color::GREEN ||
+            (oldColor == Color::YELLOW && color != Color::GREEN) ||
+            (oldColor == Color::GRAY && color == Color::GRAY));
 }
 
 void Keyboard::mark(const QString &letter, Color color) {
