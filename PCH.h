@@ -5,6 +5,7 @@
 #include <QBoxLayout>
 #include <QCheckBox>
 #include <QDataStream>
+#include <QDesktopServices>
 #include <QDialog>
 #include <QDir>
 #include <QFontDatabase>
