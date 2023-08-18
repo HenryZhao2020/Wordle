@@ -39,6 +39,10 @@ SettingsDialog QCheckBox {
     padding-right: 50;
 }
 
-HelpDialog QTextEdit {
+QTabWidget QTextEdit {
     border: 0;
+}
+
+QTabWidget QPushButton {
+    border: 5 solid transparent;
 }
