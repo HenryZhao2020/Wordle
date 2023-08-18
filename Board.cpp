@@ -115,11 +115,8 @@ bool Board::isHardConditionsMet(const QString &guess) {
             continue;
         }
 
-        int count = prevGuess.count(prevGuess[i]);
-        int realCount = Attr::answer.count(prevGuess[i]);
-        if (realCount < count) {
-            count = realCount;
-        }
+        int count = std::min(prevGuess.count(prevGuess[i]),
+            Attr::answer.count(prevGuess[i]));
 
         if (guess.count(prevGuess[i]) < count) {
             gameBar->setHintText("Missing \"" + QString(prevGuess[i]) + "\"!");
@@ -211,9 +208,7 @@ void Board::makeWon() {
         Attr::rateWon = round((double) Attr::numWon / Attr::numPlayed * 100.0);
     }
     Attr::streak++;
-    if (Attr::streak > Attr::maxStreak) {
-        Attr::maxStreak = Attr::streak;
-    }
+    Attr::maxStreak = std::max(Attr::streak, Attr::maxStreak);
 }
 
 void Board::makeLost() {
