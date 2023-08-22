@@ -4,11 +4,7 @@
 #include <QTextStream>
 
 QString File::readAll(const QString &path) {
-    QFile file(path);
-    file.open(QFile::ReadOnly);
-    QString text = file.readAll();
-    file.close();
-    return text;
+    return readLines(path).join("\n");
 }
 
 QList<QString> File::readLines(const QString &path) {
@@ -16,14 +12,14 @@ QList<QString> File::readLines(const QString &path) {
     file.open(QFile::ReadOnly);
 
     QTextStream stream(&file);
-    QList<QString> list;
-    
+    QList<QString> lines;
+
     while (!stream.atEnd()) {
-        list.append(stream.readLine());
+        lines.append(stream.readLine());
     }
 
     file.close();
-    return list;
+    return lines;
 }
 
 void File::write(const QString &path, const QString &text) {
