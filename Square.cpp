@@ -1,8 +1,6 @@
 #include "Square.h"
 #include "Attr.h"
 
-Square::Square(QWidget *parent) : QPushButton(parent) {}
-
 void Square::mark(Color color, double alpha) {
     QString style = "color: white; background: rgba(%0, %1)";
     setStyleSheet(style.arg(rgb(color)).arg(alpha));
