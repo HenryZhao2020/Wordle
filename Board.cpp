@@ -2,220 +2,194 @@
 #include "Game.h"
 #include "GameBar.h"
 #include "Square.h"
-#include "Keyboard.h"
 #include "Attr.h"
-#include "Dict.h"
+
+QList<QList<int>> SEQUENCES = {
+    {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {0, 3, 6},
+    {1, 4, 7}, {2, 5, 8}, {0, 4, 8}, {2, 4, 6},
+};
 
 Board::Board(Game *game) : QFrame(game) {
     this->game = game;
     gameBar = game->getGameBar();
+    notPlaced = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+    xsTurn = true;
 
     auto gridLayout = new QGridLayout(this);
     gridLayout->setSpacing(5);
     gridLayout->setContentsMargins(0, 0, 0, 0);
 
-    for (int r = 0; r < 6; r++) {
-        for (int c = 0; c < 5; c++) {
-            squares[r][c] = new Square(this);
-            gridLayout->addWidget(squares[r][c], r, c);
-        }
+    for (int i = 0; i < 9; i++) {
+        squares[i] = new Square(this, i);
+        gridLayout->addWidget(squares[i], i / 3, i % 3);
     }
 }
 
-void Board::append(const QString &letter) {
-    if (Attr::column == 5) {
-        return;
-    }
+void Board::place(int i, const QPixmap &pixmap, bool animated) {
+    squares[i]->setIcon(pixmap);
+    disconnect(squares[i], &QPushButton::clicked, nullptr, nullptr);
 
-    squares[Attr::row][Attr::column]->setText(letter);
-    if (Attr::animated) {
-        squares[Attr::row][Attr::column]->zoom();
-    }
-
-    Attr::column++;
-    Attr::guesses[Attr::row].append(letter);
-    gameBar->setHintVisible(false);
-}
-
-void Board::removeLast() {
-    if (Attr::column == 0) {
-        return;
-    }
-
-    Attr::column--;
-    Attr::guesses[Attr::row].removeLast();
-    gameBar->setHintVisible(false);
-
-    squares[Attr::row][Attr::column]->setText("");
-}
-
-void Board::checkGuess() {
-    gameBar->setHintVisible(Attr::hintVisible);
-
-    QString guess = Attr::guesses[Attr::row];
-    if (!isGuessValid(guess)) {   
-        gameBar->setHintPixmap(Pixmap::get("Exclamation.png"));
-        return;
-    }
-
-    markGuess(Attr::row, guess);    
-    moveRowDown();
-
-    if (guess == Attr::answer) {
-        makeWon();
-    } else if (Attr::row == 6) {
-        makeLost();
-    }
-}
-
-void Board::setTextAt(int row, int column, const QString &text) {
-    squares[row][column]->setText(text);
-}
-
-void Board::mark(int row, int column, Color color, bool animated) {
     if (animated) {
-        squares[row][column]->fade(color);
+        squares[i]->zoom();
     } else {
-        squares[row][column]->mark(color);
+        squares[i]->setIconSize(QSize(64, 64));
     }
+
+    notPlaced.removeOne(i);
 }
 
-void Board::remarkAll() {
-    for (int r = 0; r < Attr::row; r++) {
-        for (int c = 0; c < 5; c++) {
-            mark(r, c, Attr::squareColors[r][c], false);
-        }
+void Board::placeX(int i) {
+    if (!xsTurn) {
+        return;
     }
+
+    place(i, Pixmap::get("X.png"), Attr::animated);
+    Attr::xPlaced.append(i);
+    xsTurn = false;
+    gameBar->setHintVisible(false);
+
+    if (isEnded()) {
+        return;
+    }
+
+    QTimer::singleShot(500, this, [this] {
+        gameBar->setHintVisible(Attr::hintVisible);
+        gameBar->setHintText("Computer's Turn");
+    });
+
+    QTimer::singleShot(1000, this, &Board::placeO);
 }
 
-bool Board::isGuessValid(const QString &guess) {
-    if (guess.size() < 5) {
-        gameBar->setHintText("Guesses must have 5 letters!");
-        return false;
+void Board::placeO() {
+    int i = nextO();
+    place(i, Pixmap::get("O.png"), Attr::animated);
+    Attr::oPlaced.append(i);
+
+    if (isEnded()) {
+        return;
     }
 
-    if (!Dict::isExist(guess)) {
-        gameBar->setHintText("\"" + guess + "\" does not exist!");
-        return false;
-    }
-
-    if (Attr::hard && Attr::row > 0) {
-        return isHardConditionsMet(guess);
-    }
-
-    return true;
+    QTimer::singleShot(500, this, [this] {
+        xsTurn = true;
+        gameBar->setHintText("Your Turn");
+    });
 }
 
-bool Board::isHardConditionsMet(const QString &guess) {
-    QList<Color> prevColors = Attr::squareColors[Attr::row - 1];
-    QString prevGuess = Attr::guesses[Attr::row - 1];
-
-    for (int i = 0; i < 5; i++) {
-        if (prevColors[i] == Color::GRAY) {
-            continue;
-        }
-
-        int count = std::min(prevGuess.count(prevGuess[i]),
-            Attr::answer.count(prevGuess[i]));
-
-        if (guess.count(prevGuess[i]) < count) {
-            gameBar->setHintText("Missing \"" + QString(prevGuess[i]) + "\"!");
-            return false;
-        }
-    }
-
-    for (int i = 0; i < 5; i++) {
-        if (prevColors[i] == Color::GREEN && guess[i] != prevGuess[i]) {
-            QString text = "Letter #%0 must be %1!";
-            gameBar->setHintText(text.arg(i + 1).arg(prevGuess[i]));
-            return false;
-        }
-    }
-
-    return true;
+void Board::setXsTurn(bool turn) {
+    xsTurn = turn;
 }
 
-void Board::markGuess(int row, const QString &guess) {
-    QString guessCopy(guess);
-    QString answerCopy(Attr::answer);
+int Board::lastMissingIndex(const QList<int> &placed) {
+    auto isMissingOnly = [this, placed] (int a, int b, int c) {
+        return placed.contains(a) && placed.contains(b) &&
+               notPlaced.contains(c);
+    };
 
-    for (int i = 0; i < 5; i++) {
-        if (guessCopy[i] == Attr::answer[i]) {
-            Attr::squareColors[row].append(Color::GREEN);
-            answerCopy[i] = ' ';
-            guessCopy[i] = ' ';
-        } else if (!Attr::answer.contains(guessCopy[i])) {
-            Attr::squareColors[row].append(Color::GRAY);
-            guessCopy[i] = ' ';
+    for (auto &seq : SEQUENCES) {
+        if (isMissingOnly(seq[0], seq[1], seq[2])) {
+            return seq[2];
+        } else if (isMissingOnly(seq[0], seq[2], seq[1])) {
+            return seq[1];
+        } else if (isMissingOnly(seq[1], seq[2], seq[0])) {
+            return seq[0];
         }
     }
 
-    for (int i = 0; i < 5; i++) {
-        if (guessCopy[i] == ' ') {
-            continue;
-        } else if (answerCopy.contains(guessCopy[i])) {
-            Attr::squareColors[row].insert(i, Color::YELLOW);
-            answerCopy[answerCopy.indexOf(guessCopy[i])] = ' ';
-        } else {
-            Attr::squareColors[row].insert(i, Color::GRAY);
-        }
-    }
-
-    for (int i = 0; i < 5; i++) {
-        Color color = Attr::squareColors[row][i];
-        if (game->getKeyboard()->verifyKey(guess[i], color)) {
-            Attr::keyColors[guess[i]] = color;
-            game->getKeyboard()->mark(guess[i], color);
-        }
-
-        QTimer::singleShot(i * 150, this, [this, row, i, color] {
-            mark(row, i, color, Attr::animated);
-        });
-    }
+    return -1;
 }
 
-void Board::moveRowDown() {
-    Attr::row++;
-    Attr::column = 0;
+int Board::nextO() {
+    int index = lastMissingIndex(Attr::oPlaced);
+    if (index == -1) {
+        index = lastMissingIndex(Attr::xPlaced);
+    }
+    if (index == -1) {
+        index = notPlaced[QRandomGenerator::global()->bounded(notPlaced.size())];
+    }
+    return index;
+}
 
-    gameBar->setHintPixmap(Pixmap::get("Bulb.png"));
-    gameBar->refreshChancesLeft();
-    gameBar->setGiveUpButtonVisible(true);
+bool Board::isEnded() {
+    for (auto &seq : SEQUENCES) {
+        auto isThreeInRow = [seq] (const QList<int> &placed) {
+            for (auto &i : seq) {
+                if (!placed.contains(i)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        if (isThreeInRow(Attr::xPlaced)) {
+            makeWinnerX(seq);
+            return true;
+        } else if (isThreeInRow(Attr::oPlaced)) {
+            makeWinnerO(seq);
+            return true;
+        }
+    }
+
+    if (notPlaced.isEmpty()) {
+        makeTie();
+        return true;
+    }
+
+    return false;
 }
 
 void Board::makeEnded(const QPixmap &pixmap, const QString &text) {
+    for (auto &i : Attr::xPlaced) {
+        squares[i]->setIcon(Pixmap::get("X_Alpha.png"));
+    }
+
+    for (auto &i : Attr::oPlaced) {
+        squares[i]->setIcon(Pixmap::get("O_Alpha.png"));
+    }
+
+    for (auto &square : squares) {
+        connect(square, &Square::clicked, this, [this] {
+            game->restart();
+        });
+    }
+
+    gameBar->setHintVisible(Attr::hintVisible);
     gameBar->setHintPixmap(pixmap);
     gameBar->setHintText(text);
     gameBar->setRestartButtonVisible(true);
-    gameBar->setGiveUpButtonVisible(false);
-    gameBar->setHintVisible(Attr::hintVisible);
 
-    setEnabled(false);
-    game->getKeyboard()->setEnabled(false);
+    QTimer::singleShot(2000, this, [this] {
+        gameBar->setHintText("Click any square to restart...");
+    });
 
     Attr::ended = true;
     Attr::numPlayed++;
 }
 
-void Board::makeWon() {
-    makeEnded(Pixmap::get("Confetti.png"), "You guessed the word correctly!");
+void Board::makeWinnerX(const QList<int> &seq) {
+    makeEnded(Pixmap::get("Confetti.png"), "You Won!");
+    Attr::xScore++;
 
-    if (Attr::bestTry == 0 || Attr::row + 1 < Attr::bestTry) {
-        Attr::bestTry = Attr::row + 1;
+    for (auto &i : seq) {
+        squares[i]->setIcon(Pixmap::get("X.png"));
+        if (Attr::animated) {
+            squares[i]->flash();
+        }
     }
-    Attr::numWon++;
-    if (Attr::numPlayed != 0) {
-        Attr::rateWon = round((double) Attr::numWon / Attr::numPlayed * 100.0);
-    }
-    Attr::streak++;
-    Attr::maxStreak = std::max(Attr::streak, Attr::maxStreak);
 }
 
-void Board::makeLost() {
-    makeEnded(Pixmap::get("Sad.png"), "The word is \"" + Attr::answer + "\".");
-    
-    Attr::streak = 0;
-    if (Attr::numPlayed != 0) {
-        Attr::rateWon = round((double) Attr::numWon / Attr::numPlayed * 100.0);
+void Board::makeWinnerO(const QList<int> &seq) {
+    makeEnded(Pixmap::get("Computer.png"), "Computer Won!");
+    Attr::oScore++;
+
+    for (auto &i : seq) {
+        squares[i]->setIcon(Pixmap::get("O.png"));
+        if (Attr::animated) {
+            squares[i]->flash();
+        }
     }
+}
+
+void Board::makeTie() {
+    makeEnded(Pixmap::get("Handshake.png"), "Tie!");
+    Attr::numTied++;
 }
