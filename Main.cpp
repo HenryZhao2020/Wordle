@@ -3,11 +3,27 @@
 #include "Attr.h"
 #include "Dict.h"
 
+void restoreWindow() {
+    HWND hwnd = (HWND) File::readAll("WinID").toInt();
+    SendMessage(hwnd, WM_SYSCOMMAND, SC_RESTORE, 0);
+    SetForegroundWindow(hwnd); 
+    SetActiveWindow(hwnd); 
+    SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
+    RedrawWindow(hwnd, NULL, 0, RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
+}
+
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     QDir::setCurrent(QApplication::applicationDirPath());
-    QFontDatabase::addApplicationFont("Fonts/Ubuntu_Bold.ttf");
     QDir::setCurrent("Wordle_Files");
+
+    RunGuard guard("Wordle");
+    if (!guard.tryToRun()) {
+        restoreWindow();
+        return 0;
+    }
+
+    QFontDatabase::addApplicationFont("../Fonts/Ubuntu_Bold.ttf");
     Dict::load();
 
     app.setStyle("Fusion");
@@ -20,5 +36,6 @@ int main(int argc, char *argv[]) {
 
     qDebug() << Attr::answer;
 
+    File::write("WinID", QString::number(game.winId()));
     return app.exec();
 }
