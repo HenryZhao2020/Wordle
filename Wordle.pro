@@ -14,6 +14,8 @@ HEADERS += *.h
 
 TARGET = "Wordle"
 
+QMAKE_TARGET_DESCRIPTION = "Wordle"
+
 RC_ICONS = "Logo.ico"
 
 PRECOMPILED_HEADER = "PCH.h"
