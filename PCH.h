@@ -3,25 +3,9 @@
 
 #include <Windows.h>
 
-#include <QApplication>
-#include <QBoxLayout>
-#include <QCheckBox>
-#include <QDataStream>
-#include <QDesktopServices>
-#include <QDialog>
-#include <QDir>
-#include <QFontDatabase>
-#include <QFormLayout>
-#include <QFrame>
-#include <QGridLayout>
-#include <QKeyEvent>
-#include <QLabel>
-#include <QMainWindow>
-#include <QRandomGenerator>
-#include <QPushButton>
-#include <QTabWidget>
-#include <QTextEdit>
-#include <QTimer>
+#include <QtCore>
+#include <QtGui>
+#include <QtWidgets>
 
 #include "File.h"
 #include "Pixmap.h"
