@@ -1,5 +1,4 @@
-#ifndef BOARD_H
-#define BOARD_H
+#pragma once
 
 #include "PCH.h"
 #include "Color.h"
@@ -31,8 +30,6 @@ private:
     bool isHardConditionsMet(const QString &guess);
     void markGuess(int row, const QString &guess);
     void moveRowDown();
-    void makeEnded(const QPixmap &pixmap, const QString &text);
+    void makeEnded(const QIcon &icon, const QString &text);
     void makeWon();
 };
-
-#endif

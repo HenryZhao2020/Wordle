@@ -5,24 +5,27 @@
 #include "Keyboard.h"
 #include "Attr.h"
 
-Dialog::Dialog(Game *game, const QPixmap &pixmap, const QString &title)
+Dialog::Dialog(Game *game, const QIcon &icon, const QString &title)
     : QDialog(game, Qt::MSWindowsFixedSizeDialogHint) {
     this->game = game;
 
-    setWindowIcon(pixmap);
+    setWindowIcon(icon);
     setWindowTitle(title);
     setModal(true);
+    setAttribute(Qt::WA_DeleteOnClose);
 
     vboxLayout = new QVBoxLayout(this);
     vboxLayout->setSpacing(10);
     vboxLayout->setContentsMargins(30, 30, 30, 30);
 
-    buttonLayout = new QHBoxLayout(this);
+    auto buttonFrame = new QFrame(this);
+    vboxLayout->addSpacing(40);
+    vboxLayout->addWidget(buttonFrame);
+
+    buttonLayout = new QHBoxLayout(buttonFrame);
     buttonLayout->setSpacing(5);
     buttonLayout->setContentsMargins(0, 0, 0, 0);
     buttonLayout->setAlignment(Qt::AlignCenter);
-    vboxLayout->addSpacing(40);
-    vboxLayout->addLayout(buttonLayout);
 
     okButton = new QPushButton("OK", this);
     okButton->setDefault(true);
@@ -30,18 +33,21 @@ Dialog::Dialog(Game *game, const QPixmap &pixmap, const QString &title)
     buttonLayout->addWidget(okButton);
 }
 
-void Dialog::close() {
-    QDialog::close();
-    deleteLater();
+void Dialog::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Escape) {
+        close();
+    }
 }
 
 StatsDialog::StatsDialog(Game *game)
-    : Dialog(game, Pixmap::get("Stats.png"), "Statistics") {
-    formLayout = new QFormLayout();
+    : Dialog(game, getIcon("Stats.svg"), "Statistics") {
+    auto formFrame = new QFrame(this);
+    vboxLayout->insertWidget(0, formFrame);
+
+    formLayout = new QFormLayout(formFrame);
     formLayout->setHorizontalSpacing(80);
     formLayout->setVerticalSpacing(10);
     formLayout->setContentsMargins(0, 0, 0, 0);
-    vboxLayout->insertLayout(0, formLayout);
 
     addRow("# Played:", Attr::numPlayed);
     addRow("# Won:", Attr::numWon);
@@ -72,7 +78,7 @@ void StatsDialog::reset() {
 }
 
 SettingsDialog::SettingsDialog(Game *game)
-    : Dialog(game, Pixmap::get("Settings.png"), "Settings") {
+    : Dialog(game, getIcon("Settings.svg"), "Settings") {
     newBox("Enable Animation", &Attr::animated);
     newBox("Show Hint", &Attr::hintVisible);
     newBox("Hard Mode", &Attr::hard);
@@ -94,8 +100,8 @@ QCheckBox *SettingsDialog::newBox(const QString &text, bool *var) {
 }
 
 void SettingsDialog::apply() {
-    for (auto &box : boxes.keys()) {
-        *boxes[box] = box->isChecked();
+    for (auto it = boxes.begin(); it != boxes.end(); it++) {
+        *it.value() = it.key()->isChecked();
     }
 
     game->getGameBar()->setHintVisible(Attr::hintVisible);
@@ -104,7 +110,7 @@ void SettingsDialog::apply() {
 }
 
 HelpDialog::HelpDialog(Game *game)
-    : Dialog(game, Pixmap::get("Help.png"), "Help") {
+    : Dialog(game, getIcon("Help.svg"), "Help") {
     tabWidget = new QTabWidget(this);
     tabWidget->addTab(newTextEdit("Rules.html"), "Rules");
     vboxLayout->insertWidget(0, tabWidget);
@@ -117,22 +123,22 @@ HelpDialog::HelpDialog(Game *game)
     aboutLayout->setContentsMargins(0, 0, 0, 0);
     aboutLayout->addWidget(newTextEdit("About.html"), 0, 0, 1, 0);
 
-    auto webButton = new QPushButton("Website");
+    auto webButton = new QPushButton("Website", this);
     webButton->setCursor(Qt::PointingHandCursor);
     connect(webButton, &QPushButton::clicked, this, [] {
-        QUrl url("https://github.com/HenryZhao2020/Wordle");
+        static QUrl url("https://github.com/HenryZhao2020/TicTacToe");
         QDesktopServices::openUrl(url);
     });
     aboutLayout->addWidget(webButton, 1, 0);
 
-    auto qtButton = new QPushButton("About Qt");
+    auto qtButton = new QPushButton("About Qt", this);
     qtButton->setCursor(Qt::PointingHandCursor);
     connect(qtButton, &QPushButton::clicked, this, &QApplication::aboutQt);
     aboutLayout->addWidget(qtButton, 1, 1);
 }
 
 QTextEdit *HelpDialog::newTextEdit(const QString &htmlFile) {
-    auto textEdit = new QTextEdit(tabWidget);
+    auto textEdit = new QTextEdit(this);
     textEdit->setReadOnly(true);
     textEdit->setHtml(File::readAll(htmlFile));
     return textEdit;

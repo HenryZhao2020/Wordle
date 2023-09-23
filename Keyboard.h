@@ -1,5 +1,4 @@
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#pragma once
 
 #include "PCH.h"
 #include "Color.h"
@@ -25,5 +24,3 @@ private:
     QPushButton *newKey(const QString &letter);
     void addKeys(const QList<QString> &letters, QHBoxLayout *layout);
 };
-
-#endif

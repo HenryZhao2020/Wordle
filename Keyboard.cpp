@@ -12,7 +12,7 @@ Keyboard::Keyboard(Board *board) : QFrame(board) {
     addKeys({"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"}, newRow());
     addKeys({"A", "S", "D", "F", "G", "H", "J", "K", "L"}, newRow());
 
-    auto bottomRow = newRow();
+    QHBoxLayout *bottomRow = newRow();
 
     auto backspaceKey = new QPushButton("Back", this);
     backspaceKey->setObjectName("keyWide");
@@ -48,16 +48,18 @@ void Keyboard::mark(const QString &letter, Color color) {
 }
 
 void Keyboard::remarkAll() {
-    for (auto &letter : Attr::keyColors.keys()) {
-        mark(letter, Attr::keyColors[letter]);
+    for (auto it = Attr::keyColors.begin(); it != Attr::keyColors.end(); it++) {
+        mark(it.key(), it.value());
     }
 }
 
 QHBoxLayout *Keyboard::newRow() {
-    auto hboxLayout = new QHBoxLayout();
+    auto rowFrame = new QFrame(this);
+    vboxLayout->addWidget(rowFrame);
+
+    auto hboxLayout = new QHBoxLayout(rowFrame);
     hboxLayout->setSpacing(5);
     hboxLayout->setContentsMargins(0, 0, 0, 0);
-    vboxLayout->addLayout(hboxLayout);
     return hboxLayout;
 }
 

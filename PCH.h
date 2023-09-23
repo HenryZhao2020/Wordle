@@ -1,6 +1,3 @@
-#ifndef PCH_H
-#define PCH_H
-
 #include <Windows.h>
 
 #include <QtCore>
@@ -8,7 +5,5 @@
 #include <QtWidgets>
 
 #include "File.h"
-#include "Pixmap.h"
+#include "Icon.h"
 #include "SingleApplication/SingleApplication"
-
-#endif

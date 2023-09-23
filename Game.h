@@ -1,5 +1,4 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include "PCH.h"
 
@@ -27,5 +26,3 @@ private:
 
     void keyPressEvent(QKeyEvent *event);
 };
-
-#endif

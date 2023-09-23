@@ -1,34 +1,30 @@
-#ifndef ATTR_H
-#define ATTR_H
+#pragma once
 
 #include "PCH.h"
 #include "Color.h"
 
-class Attr {
-public:
-    static int row;
-    static int column;
+namespace Attr {
+    inline int row;
+    inline int column;
 
-    static QString answer;
-    static QList<QString> guesses;
-    static QList<QList<Color>> squareColors;
-    static QHash<QString, Color> keyColors;
-    static bool ended;
+    inline QString answer;
+    inline QList<QString> guesses(6);
+    inline QList<QList<Color>> squareColors(6);
+    inline QHash<QString, Color> keyColors;
+    inline bool ended;
 
-    static int numPlayed;
-    static int numWon;
-    static int rateWon;
-    static int bestTry;
-    static int streak;
-    static int maxStreak;
+    inline int numPlayed;
+    inline int numWon;
+    inline int rateWon;
+    inline int bestTry;
+    inline int streak;
+    inline int maxStreak;
 
-    static bool animated;
-    static bool hintVisible;
-    static bool hard;
-    static bool colorBlind;
+    inline bool animated = true;
+    inline bool hintVisible = true;
+    inline bool hard;
+    inline bool colorBlind;
 
-    static void save();
-    static bool load();
-};
-
-#endif
+    void save();
+    bool load();
+}

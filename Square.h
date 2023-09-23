@@ -1,5 +1,4 @@
-#ifndef SQUARE_H
-#define SQUARE_H
+#pragma once
 
 #include "PCH.h"
 #include "Color.h"
@@ -11,8 +10,10 @@ public:
     using QPushButton::QPushButton;
 
     void mark(Color color, double alpha = 1);
-    void fade(Color color, double alpha = 0);
-    void zoom(int fontSize = 1);
-};
+    void fade(Color color);
+    void zoom();
 
-#endif
+private:
+    double alpha;
+    int fontSize;
+};

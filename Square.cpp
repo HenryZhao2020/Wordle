@@ -6,24 +6,35 @@ void Square::mark(Color color, double alpha) {
     setStyleSheet(style.arg(rgb(color)).arg(alpha));
 }
 
-void Square::fade(Color color, double alpha) {
-    if (alpha > 1) {
-        return;
-    }
+void Square::fade(Color color) {
+    alpha = 0;
 
-    mark(color, alpha);
-    QTimer::singleShot(8, this, [this, color, alpha] {
-        fade(color, alpha + 0.05);
+    auto timer = new QTimer(this);
+    timer->setInterval(8);
+    connect(timer, &QTimer::timeout, this, [this, timer, color] {
+        if (alpha > 1) {
+            timer->deleteLater();
+            return;
+        }
+
+        alpha += 0.05;
+        mark(color, alpha);
     });
+    timer->start();
 }
 
-void Square::zoom(int fontSize) {
-    if (fontSize > 24) {
-        return;
-    }
+void Square::zoom() {
+    fontSize = 0;
 
-    setStyleSheet("font-size: " + QString::number(fontSize) + "px");
-    QTimer::singleShot(4, this, [this, fontSize] {
-        zoom(fontSize + 1);
+    auto timer = new QTimer(this);
+    timer->setInterval(4);
+    connect(timer, &QTimer::timeout, this, [this, timer] {
+        if (fontSize > 24) {
+            timer->deleteLater();
+            return;
+        }
+
+        setStyleSheet("font-size: " + QString::number(++fontSize) + "px");
     });
+    timer->start();
 }

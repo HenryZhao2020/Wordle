@@ -1,5 +1,4 @@
-#ifndef COLOR_H
-#define COLOR_H
+#pragma once
 
 #include "PCH.h"
 
@@ -10,5 +9,3 @@ enum Color {
 };
 
 QString rgb(Color color);
-
-#endif

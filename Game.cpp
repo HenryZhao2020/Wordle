@@ -14,8 +14,11 @@ Game::Game() : QMainWindow(nullptr, Qt::MSWindowsFixedSizeDialogHint) {
     vboxLayout->setContentsMargins(30, 30, 30, 30);
 
     bar = new GameBar(this);
-    bar->setHintPixmap(Pixmap::get("Bulb.png"));
+    bar->setHintVisible(Attr::hintVisible);
+    bar->setHintIcon(getIcon("Bulb.svg"));
+    bar->setHintText("Type a letter to begin...");
     bar->setRestartButtonVisible(false);
+    bar->setGiveUpButtonVisible(false);
     vboxLayout->addWidget(bar);
 
     board = new Board(this);
@@ -40,13 +43,13 @@ Keyboard *Game::getKeyboard() {
 void Game::restart() {
     Attr::row = 0;
     Attr::column = 0;
-    Attr::answer = Dict::generateAnswer();
+    Attr::answer = Dict::generate();
     Attr::guesses = QList<QString>(6);
     Attr::squareColors = QList<QList<Color>>(6);
     Attr::keyColors.clear();
     Attr::ended = false;
 
-    bar->setHintPixmap(Pixmap::get("Bulb.png"));
+    bar->setHintIcon(getIcon("Bulb.svg"));
     bar->setHintText("Type a letter to begin...");
     bar->setRestartButtonVisible(false);
 
@@ -66,10 +69,8 @@ void Game::restart() {
 
 void Game::restore() {
     if (!Attr::load()) {
-        bar->setHintText("Type a letter to begin...");
-        bar->setGiveUpButtonVisible(false);
-        bar->setHintVisible(Attr::hintVisible);
-        Attr::answer = Dict::generateAnswer();
+        Attr::answer = Dict::generate();
+        qDebug() << Attr::answer;
         return;
     }
 
@@ -94,6 +95,8 @@ void Game::restore() {
 
     board->remarkAll();
     keyboard->remarkAll();
+
+    qDebug() << Attr::answer;
 }
 
 void Game::keyPressEvent(QKeyEvent *event) {

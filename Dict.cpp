@@ -1,7 +1,6 @@
 #include "Dict.h"
 
-QList<QString> Dict::words = {};
-QList<QString> Dict::answers = {};
+QList<QString> words, answers;
 
 void Dict::load() {
     words = File::readLines("Words.txt");
@@ -12,6 +11,6 @@ bool Dict::isExist(const QString &word) {
     return words.contains(word);
 }
 
-QString Dict::generateAnswer() {
+QString Dict::generate() {
     return answers[QRandomGenerator::global()->bounded(answers.size())];
 }

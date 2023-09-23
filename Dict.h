@@ -1,16 +1,9 @@
-#ifndef DICT_H
-#define DICT_H
+#pragma once
 
 #include "PCH.h"
 
-class Dict {
-public:
-    static void load();
-    static bool isExist(const QString &word);
-    static QString generateAnswer();
-
-private:
-    static QList<QString> words, answers;
-};
-
-#endif
+namespace Dict {
+    void load();
+    bool isExist(const QString &word);
+    QString generate();
+}

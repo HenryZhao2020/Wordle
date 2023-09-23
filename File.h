@@ -1,14 +1,12 @@
-#ifndef FILE_H
-#define FILE_H
+#pragma once
 
-class File {
-public:
-    static QString readAll(const QString &path);
-    static QList<QString> readLines(const QString &path);
+#include <QList>
 
-    static void write(const QString &path, const QString &text);
-    static void writeLines(const QString &path, const QList<QString> &list);
-    static void append(const QString &path, const QString &text);
-};
+namespace File {
+    QString readAll(const QString &path);
+    QList<QString> readLines(const QString &path);
 
-#endif
+    void write(const QString &path, const QString &text);
+    void writeLines(const QString &path, const QList<QString> &list);
+    void append(const QString &path, const QString &text);
+}
