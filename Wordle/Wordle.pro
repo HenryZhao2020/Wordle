@@ -16,7 +16,7 @@ QMAKE_TARGET_DESCRIPTION = "Wordle"
 
 RC_ICONS = "Logo.ico"
 
-VERSION = 1.2.0
+VERSION = 1.2.1
 
 SOURCES += *.cpp
 
