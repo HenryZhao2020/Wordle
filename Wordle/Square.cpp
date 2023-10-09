@@ -10,7 +10,6 @@ void Square::fade(Color color) {
     alpha = 0;
 
     auto timer = new QTimer(this);
-    timer->setInterval(8);
     connect(timer, &QTimer::timeout, this, [this, timer, color] {
         if (alpha > 1) {
             timer->deleteLater();
@@ -20,14 +19,13 @@ void Square::fade(Color color) {
         alpha += 0.05;
         mark(color, alpha);
     });
-    timer->start();
+    timer->start(8);
 }
 
 void Square::zoom() {
     fontSize = 0;
 
     auto timer = new QTimer(this);
-    timer->setInterval(4);
     connect(timer, &QTimer::timeout, this, [this, timer] {
         if (fontSize > 24) {
             timer->deleteLater();
@@ -36,5 +34,5 @@ void Square::zoom() {
 
         setStyleSheet("font-size: " + QString::number(++fontSize) + "px");
     });
-    timer->start();
+    timer->start(4);
 }
