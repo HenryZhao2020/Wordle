@@ -3,7 +3,6 @@
 #include "PCH.h"
 
 class Game;
-class Dialog;
 
 class GameBar : public QFrame {
     Q_OBJECT
@@ -28,6 +27,5 @@ private:
     QPushButton *restartButton;
     QPushButton *giveUpButton;
 
-    QPushButton *newButton(const QIcon &icon, const QString &tip, 
-                           std::function<void ()> lambda);
+    QPushButton *newButton(const QIcon &icon, const QString &tip);
 };

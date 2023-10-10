@@ -35,16 +35,11 @@ int main(int argc, char *argv[]) {
 
     app.setStyle("Fusion");
     app.setStyleSheet(File::readAll("Styles.qss"));
+    WinAPI::detectModeChange();
+    WinAPI::detectDpiChange();
     QObject::connect(&app, &QApplication::aboutToQuit, &app, &Attr::save);
     QObject::connect(&app, &SingleApplication::receivedMessage,
                      &app, &receivedMessage);
-
-    QTimer timer;
-    QObject::connect(&timer, &QTimer::timeout, &app, [] {
-        QApplication::setStyle("Fusion");
-        game->adjustSize();
-    });
-    timer.start(1000);
 
     game = new Game();
     game->restore();

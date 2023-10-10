@@ -20,25 +20,30 @@ GameBar::GameBar(Game *game) : QFrame(game) {
     hboxLayout->addWidget(hintLabel);
     hboxLayout->addStretch();
 
-    restartButton = newButton(getIcon("Restart.svg"), "Restart", [game] {
+    restartButton = newButton(getIcon("Restart.svg"), "Restart");
+    connect(restartButton, &QPushButton::clicked, this, [game] {
         game->restart();
     });
 
-    giveUpButton = newButton(getIcon("GiveUp.svg"), "Give Up", [game] {
+    giveUpButton = newButton(getIcon("GiveUp.svg"), "Give Up");
+    connect(giveUpButton, &QPushButton::clicked, this, [game] {
         game->getBoard()->makeLost();
     });
 
-    newButton(getIcon("Settings.svg"), "Settings", [game] {
+    auto settingsButton = newButton(getIcon("Settings.svg"), "Settings");
+    connect(settingsButton, &QPushButton::clicked, this, [game] {
         auto settingsDialog = new SettingsDialog(game);
         settingsDialog->show();
     });
-    
-    newButton(getIcon("Stats.svg"), "Statistics", [game] {
+
+    auto statsButton = newButton(getIcon("Stats.svg"), "Statistics");
+    connect(statsButton, &QPushButton::clicked, this, [game] {
         auto statsDialog = new StatsDialog(game);
         statsDialog->show();
     });
 
-    newButton(getIcon("Help.svg"), "Help", [game] {
+    auto helpButton = newButton(getIcon("Help.svg"), "Help");
+    connect(helpButton, &QPushButton::clicked, this, [game] {
         auto helpDialog = new HelpDialog(game);
         helpDialog->show();
     });
@@ -95,14 +100,12 @@ void GameBar::refreshChancesLeft() {
     }
 }
 
-QPushButton *GameBar::newButton(const QIcon &icon, const QString &tip, 
-                                std::function<void ()> lambda) {
+QPushButton *GameBar::newButton(const QIcon &icon, const QString &tip) {
     auto button = new QPushButton(this);
     button->setIcon(icon);
     button->setIconSize(QSize(24, 24));
     button->setToolTip(tip);
     button->setCursor(Qt::PointingHandCursor);
-    connect(button, &QPushButton::clicked, this, lambda);
     hboxLayout->addWidget(button);
     return button;
 }
