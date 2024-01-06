@@ -1,5 +1,8 @@
 # Wordle
+
 A fun word-guessing game that practices your vocabulary skills!
+
+Download Latest Version: https://github.com/HenryZhao2020/Wordle/releases/download/v2.0.0/Wordle-v2.0.0.zip
 
 
 # Preview
