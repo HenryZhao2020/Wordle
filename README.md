@@ -2,8 +2,6 @@
 
 A fun word-guessing game that practices your vocabulary skills!
 
-Download Latest Version: https://github.com/HenryZhao2020/Wordle/releases/download/v2.0.0/Wordle-v2.0.0.zip
-
 
 # Preview
 
@@ -54,7 +52,7 @@ Color Blind Mode:
 
 Settings Dialog:
 
-![image](https://github.com/HenryZhao2020/Wordle/assets/75873192/dbfffca6-e046-4433-9451-7eb1a033f282)
+![image](https://github.com/HenryZhao2020/Wordle/assets/75873192/bec789cb-6dc7-491a-b1d1-197282d85863)
 
 
 Statistics Dialog:
@@ -64,4 +62,6 @@ Statistics Dialog:
 
 Help Dialog:
 
-![image](https://github.com/HenryZhao2020/Wordle/assets/75873192/90e3546f-5abe-4e42-8ce8-7543c54bfa26)
+![image](https://github.com/HenryZhao2020/Wordle/assets/75873192/acd78ffe-3f79-474a-9727-6afc0c432183)
+
+![image](https://github.com/HenryZhao2020/Wordle/assets/75873192/b3ec9595-7605-4494-af46-60df36a74420)
