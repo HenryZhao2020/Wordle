@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/fonts">
+        <file>MontserratAlternates-Medium.ttf</file>
+        <file>ZCOOLKuaiLe-Regular.ttf</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file>Bell.svg</file>
+        <file>Help.svg</file>
+        <file>Restart.svg</file>
+        <file>Settings.svg</file>
+        <file>Win.svg</file>
+        <file>GiveUp.svg</file>
+        <file>Lose.svg</file>
+        <file>Stats.svg</file>
+        <file>Warning.svg</file>
+    </qresource>
+    <qresource prefix="/conf">
+        <file>Styles.qss</file>
+        <file>Answers.txt</file>
+        <file>Words.txt</file>
+    </qresource>
+    <qresource prefix="/help">
+        <file>About.html</file>
+        <file>About_zh_CN.html</file>
+        <file>About_zh_TW.html</file>
+        <file>Rules.html</file>
+        <file>Rules_zh_CN.html</file>
+        <file>Rules_zh_TW.html</file>
+    </qresource>
+</RCC>

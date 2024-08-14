@@ -1,0 +1,36 @@
+* {
+    font: 14px Montserrat Alternates, ZCOOL KuaiLe;
+}
+
+GameBar QPushButton {
+    border: 0;
+    qproperty-iconSize: 24px 24px;
+}
+
+Square {
+    width: 60;
+    height: 60;
+    border: 2 solid silver;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+
+Keyboard {
+    min-width: 480;
+}
+
+Keyboard QPushButton {
+    margin: 0;
+    height: 30;
+}
+
+StatsDialog QLabel {
+    qproperty-alignment: AlignCenter;
+}
+
+HelpDialog QTextBrowser {
+    min-width: 350;
+    min-height: 300;
+    border: 0;
+}
